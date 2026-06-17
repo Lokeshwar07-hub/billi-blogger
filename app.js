@@ -29,7 +29,7 @@ app.use(checkForAuhtenticationCookie("token"));
 app.use(express.static(path.resolve('./public')));
 
 app.get('/', async(req, res) => {
-    const allBlogs = await Blog.find({});
+    const allBlogs = await Blog.find({}).populate("createdBy");
     res.render("home", {
         user: req.user,
         blogs: allBlogs,

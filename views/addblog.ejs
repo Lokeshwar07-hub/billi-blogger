@@ -3,61 +3,237 @@
 
 <head>
     <%- include('./partials/head') %>
-    <title>Add New Blog</title>
+    <title>Write a New Blog - Blogify</title>
 </head>
 
 <body>
     <%- include('./partials/nav') %>
 
-    <div class="container mt-4">
-        <h1 class="mb-4">Add New Blog</h1>
+    <!-- Main Section -->
+    <section class="section">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <!-- Page Header -->
+                    <div style="margin-bottom: 2rem;">
+                        <h1 class="display-6 fw-bold">Write Your Story</h1>
+                        <p class="lead text-muted">Share your thoughts, ideas, and expertise with our community.</p>
+                    </div>
 
-        <form action="/blog/add-new" method="POST" enctype="multipart/form-data">
+                    <!-- Form Card -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 p-md-5">
+                            <form action="/blog/add-new" method="POST" enctype="multipart/form-data" id="blogForm">
+                                
+                                <!-- Cover Image Upload -->
+                                <div class="mb-4">
+                                    <label for="coverImage" class="form-label fw-semibold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                            <polyline points="21 15 16 10 5 21"></polyline>
+                                        </svg>
+                                        Cover Image
+                                    </label>
+                                    <div class="upload-area border-2" id="coverImageDropZone" style="
+                                        border: 2px dashed var(--border-color);
+                                        border-radius: 8px;
+                                        padding: 2rem;
+                                        text-align: center;
+                                        cursor: pointer;
+                                        transition: all 0.2s ease;
+                                        background-color: var(--bg-light);
+                                    ">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" style="margin-bottom: 1rem; margin-left: auto; margin-right: auto; display: block;">
+                                            <path d="M12 2v20M2 12h20"></path>
+                                        </svg>
+                                        <p style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-primary);">
+                                            Drag and drop your cover image here
+                                        </p>
+                                        <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">
+                                            or click to select a file
+                                        </p>
+                                        <input
+                                            type="file"
+                                            class="form-control d-none"
+                                            id="coverImage"
+                                            name="coverImage"
+                                            accept="image/*"
+                                            required
+                                            onchange="updateFileName(this)"
+                                        >
+                                        <small style="color: var(--text-muted);">
+                                            Recommended: 1200x630px | Max 5MB | Formats: JPG, PNG
+                                        </small>
+                                        <div id="fileName" style="margin-top: 1rem; color: var(--primary-color); font-weight: 500;"></div>
+                                    </div>
+                                    <div id="imagePreview" style="margin-top: 1rem;"></div>
+                                </div>
 
-            <div class="mb-3">
-                <label for="coverImage" class="form-label">Cover Image</label>
-                <input
-                    type="file"
-                    class="form-control"
-                    id="coverImage"
-                    name="coverImage"
-                    accept="image/*"
-                    required
-                >
+                                <!-- Blog Title -->
+                                <div class="mb-4">
+                                    <label for="title" class="form-label fw-semibold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                        </svg>
+                                        Blog Title
+                                    </label>
+                                    <input
+                                        type="text"
+                                        class="form-control"
+                                        id="title"
+                                        name="title"
+                                        placeholder="Enter an engaging title for your blog"
+                                        required
+                                        maxlength="100"
+                                    >
+                                    <small style="color: var(--text-muted);">
+                                        <span id="titleCount">0</span>/100 characters
+                                    </small>
+                                </div>
+
+                                <!-- Blog Body -->
+                                <div class="mb-4">
+                                    <label for="body" class="form-label fw-semibold">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                                        </svg>
+                                        Blog Content
+                                    </label>
+                                    <textarea
+                                        class="form-control"
+                                        id="body"
+                                        name="body"
+                                        rows="12"
+                                        placeholder="Write your blog content here. You can use multiple paragraphs by pressing Enter twice."
+                                        required
+                                        style="resize: vertical; font-family: monospace;"
+                                    ></textarea>
+                                    <small style="color: var(--text-muted); display: block; margin-top: 0.5rem;">
+                                        <span id="wordCount">0</span> words | <span id="charCount">0</span> characters
+                                    </small>
+                                </div>
+
+                                <!-- Form Actions -->
+                                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                                    <button 
+                                        type="submit" 
+                                        class="btn btn-primary btn-lg"
+                                    >
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                            <line x1="7" y1="5" x2="12" y2="5"></line>
+                                        </svg>
+                                        Publish Blog
+                                    </button>
+                                    <a href="/" class="btn btn-outline-primary btn-lg">
+                                        Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Tips Section -->
+                    <div style="margin-top: 3rem; padding: 2rem; background-color: var(--bg-light); border-radius: 8px;">
+                        <h5 style="margin-bottom: 1rem; font-weight: 600;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-color)" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -3px;">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="16" x2="12" y2="12"></line>
+                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            Writing Tips
+                        </h5>
+                        <ul style="color: var(--text-muted); margin-bottom: 0;">
+                            <li>Use a clear, compelling title that describes your blog</li>
+                            <li>Start with an engaging introduction to hook your readers</li>
+                            <li>Break your content into short paragraphs for readability</li>
+                            <li>Use a high-quality cover image that represents your topic</li>
+                            <li>Proofread before publishing to ensure quality</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
+        </div>
+    </section>
 
-            <div class="mb-3">
-                <label for="title" class="form-label">Title</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="title"
-                    name="title"
-                    placeholder="Enter blog title"
-                    required
-                >
-            </div>
-
-            <div class="mb-3">
-                <label for="body" class="form-label">Body</label>
-                <textarea
-                    class="form-control"
-                    id="body"
-                    name="body"
-                    rows="10"
-                    placeholder="Write your blog here..."
-                    required
-                ></textarea>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                Publish Blog
-            </button>
-
-        </form>
-    </div>
-
+    <%- include('./partials/footer') %>
     <%- include('./partials/scripts') %>
+
+    <!-- Form Enhancement Script -->
+    <script>
+        // Character count for title
+        document.getElementById('title').addEventListener('input', function() {
+            document.getElementById('titleCount').textContent = this.value.length;
+        });
+
+        // Word and character count for body
+        document.getElementById('body').addEventListener('input', function() {
+            const text = this.value;
+            const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const chars = text.length;
+            document.getElementById('wordCount').textContent = words;
+            document.getElementById('charCount').textContent = chars;
+        });
+
+        // Drag and drop for cover image
+        const dropZone = document.getElementById('coverImageDropZone');
+        const fileInput = document.getElementById('coverImage');
+
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.borderColor = 'var(--primary-color)';
+                dropZone.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, () => {
+                dropZone.style.borderColor = 'var(--border-color)';
+                dropZone.style.backgroundColor = 'var(--bg-light)';
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            fileInput.files = files;
+            updateFileName(fileInput);
+        });
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        function updateFileName(input) {
+            const fileName = document.getElementById('fileName');
+            const imagePreview = document.getElementById('imagePreview');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                fileName.textContent = '✓ ' + file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)';
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.innerHTML = '<img src="' + e.target.result + '" style="max-width: 100%; max-height: 300px; border-radius: 8px; margin-top: 1rem;">';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
 </body>
 
 </html>

@@ -3,29 +3,150 @@
 
 <head>
     <%- include('./partials/head') %>
-        <title>Signin</title>
+    <title>Sign In - Blogify</title>
 </head>
 
 <body>
     <%- include('./partials/nav') %>
 
-        <div class="container" mt-4">
-            <form action="/user/signin" method="POST">
-            
-                <div class="mb-3">
-                    <label for="exampleInputEmail1" class="form-label">Email address</label>
-                    <input type="email" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
-                    <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
-                </div>
-                <div class="mb-3">
-                    <label for="exampleInputPassword1" class="form-label">Password</label>
-                    <input type="password" name= "password" class="form-control" id="exampleInputPassword1">
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-        </div>
+    <!-- Auth Section -->
+    <section class="section d-flex align-items-center" style="min-height: 70vh;">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6 col-lg-5 mx-auto">
+                    <!-- Auth Card -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body p-4 p-md-5">
+                            <!-- Card Header -->
+                            <div style="text-align: center; margin-bottom: 2rem;">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--primary-color)" stroke-width="2" style="margin-bottom: 1rem;">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                <h2 style="margin-bottom: 0.5rem; font-weight: 700;">Welcome Back</h2>
+                                <p style="color: var(--text-muted);">Sign in to your Blogify account</p>
+                            </div>
 
-        <%- include('./partials/scripts') %>
+                            <!-- Sign In Form -->
+                            <form action="/user/signin" method="POST">
+                                
+                                <!-- Email Input -->
+                                <div class="mb-3">
+                                    <label for="email" class="form-label fw-semibold">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                                        </svg>
+                                        Email Address
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        class="form-control form-control-lg"
+                                        id="email"
+                                        name="email"
+                                        placeholder="name@example.com"
+                                        required
+                                        autocomplete="email"
+                                    >
+                                    <small style="color: var(--text-muted); display: block; margin-top: 0.25rem;">
+                                        We'll never share your email with anyone else.
+                                    </small>
+                                </div>
+
+                                <!-- Password Input -->
+                                <div class="mb-4">
+                                    <label for="password" class="form-label fw-semibold">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                        </svg>
+                                        Password
+                                    </label>
+                                    <input 
+                                        type="password" 
+                                        class="form-control form-control-lg"
+                                        id="password"
+                                        name="password"
+                                        placeholder="Enter your password"
+                                        required
+                                        autocomplete="current-password"
+                                    >
+                                </div>
+
+                                <!-- Remember Me / Forgot Password -->
+                                <div class="mb-4 d-flex align-items-center justify-content-between">
+                                    <div class="form-check">
+                                        <input 
+                                            class="form-check-input" 
+                                            type="checkbox" 
+                                            id="rememberMe"
+                                            name="rememberMe"
+                                        >
+                                        <label class="form-check-label" for="rememberMe">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                    <a href="#" style="font-size: 0.9rem; text-decoration: none;">Forgot password?</a>
+                                </div>
+
+                                <!-- Sign In Button -->
+                                <button 
+                                    type="submit" 
+                                    class="btn btn-primary btn-lg w-100 mb-3"
+                                >
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                                        <polyline points="10 17 15 12 10 7"></polyline>
+                                        <line x1="15" y1="12" x2="3" y2="12"></line>
+                                    </svg>
+                                    Sign In
+                                </button>
+                            </form>
+
+                            <!-- Divider -->
+                            <div style="display: flex; align-items: center; margin: 2rem 0; gap: 1rem;">
+                                <div style="flex: 1; height: 1px; background-color: var(--border-color);"></div>
+                                <span style="color: var(--text-muted); font-size: 0.9rem;">OR</span>
+                                <div style="flex: 1; height: 1px; background-color: var(--border-color);"></div>
+                            </div>
+
+                            <!-- Sign Up Link -->
+                            <p style="text-align: center; color: var(--text-muted); margin-bottom: 0;">
+                                Don't have an account? 
+                                <a href="/user/signup" style="font-weight: 600;">
+                                    Create one now
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Additional Info -->
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <p style="color: var(--text-muted); font-size: 0.9rem;">
+                            By signing in, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Sidebar - Only show on large screens -->
+                <div class="col-lg-6 d-none d-lg-flex align-items-center" style="background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%); color: white; min-height: 70vh;">
+                    <div style="padding: 3rem; text-align: center;">
+                        <h3 style="color: white; margin-bottom: 1rem; font-weight: 700;">Welcome to Blogify</h3>
+                        <p style="font-size: 1.1rem; margin-bottom: 2rem; opacity: 0.9;">
+                            A platform to share your thoughts, ideas, and expertise with a global community of readers.
+                        </p>
+                        <svg width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1" style="margin: 0 auto; opacity: 0.3;">
+                            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer') %>
+    <%- include('./partials/scripts') %>
 </body>
 
 </html>

@@ -3,68 +3,263 @@
 
 <head>
     <%- include('./partials/head') %>
-        <title>
-            <%= blog.title %>
-        </title>
+    <title><%= blog.title %> - Blogify</title>
 </head>
 
 <body>
     <%- include('./partials/nav') %>
 
-        <div class="container mt-4">
+    <!-- Blog Detail Section -->
+    <article class="section">
+        <div class="container-lg">
+            <div class="row">
+                <!-- Main Blog Content -->
+                <div class="col-lg-8">
+                    <!-- Blog Header -->
+                    <div class="blog-header">
+                        <!-- Blog Cover Image -->
+                        <img 
+                            src="<%= blog.coverImageURL %>"
+                            class="blog-cover"
+                            alt="<%= blog.title %>"
+                            loading="lazy"
+                        >
 
-            <img src="<%= blog.coverImageURL %>" class="img-fluid mb-3" alt="Blog Image">
+                        <!-- Blog Title -->
+                        <h1 class="blog-title">
+                            <%= blog.title %>
+                        </h1>
 
-            <h1>
-                <%= blog.title %>
-            </h1>
+                        <!-- Blog Metadata -->
+                        <div class="blog-meta">
+                            <!-- Author Info -->
+                            <div class="blog-meta-item">
+                                <img 
+                                    src="<%= blog.createdBy.profileImage || 'https://via.placeholder.com/40' %>"
+                                    alt="<%= blog.createdBy.fullName %>"
+                                    class="author-avatar"
+                                    loading="lazy"
+                                >
+                                <div>
+                                    <div style="font-weight: 600; color: var(--text-primary);">
+                                        <%= blog.createdBy.fullName %>
+                                    </div>
+                                </div>
+                            </div>
 
-            <p class="text-muted">
-                Created by <%= blog.createdBy.fullName %>
-            </p>
+                            <!-- Published Date -->
+                            <div class="blog-meta-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                <time>
+                                    <% 
+                                        const date = new Date(blog.createdAt);
+                                        const formattedDate = date.toLocaleDateString('en-US', { 
+                                            year: 'numeric', 
+                                            month: 'long', 
+                                            day: 'numeric' 
+                                        });
+                                    %>
+                                    <%= formattedDate %>
+                                </time>
+                            </div>
 
-            <hr>
-
-            <pre class="mt-4">
-            <%= blog.body %>
-        </pre>
-        </div>
-        <div class="container mt-4">
-            <img src="<%= blog.createdBy.profileImage %>" width="50" height="50" alt="Profile Image">
-
-            <span class="ms-2">
-                <%= blog.createdBy.fullName %>
-            </span>
-        </div>
-
-        <div class="container mt-3">
-            <h1>Comments (<%= (comments.length)%>) </h1>
-            <% if (locals.user) { %>
-                <div class="container mt-4">
-                    <form action="/blog/comment/<%= blog._id %>" method="POST">
-
-                        <div class="mb-3">
-
-                            <input type="text" name="content" class="form-control" placeholder="Enter your Comment">
-                            <button class="btn btn-sn btn-primary mt-2" type="submit">ADD</button>
+                            <!-- Read Time (estimated) -->
+                            <div class="blog-meta-item">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span>
+                                    <% 
+                                        const words = blog.body ? blog.body.split(/\s+/).length : 0;
+                                        const readTime = Math.ceil(words / 200);
+                                    %>
+                                    <%= readTime %> min read
+                                </span>
+                            </div>
                         </div>
 
-                    </form>
-                </div>
-                <% } %>
-                <div class="mt-3">
-                    <% comments.forEach(comment=> { %>
-                        <div>
-                            <img src="<%= comment.createdBy.profileImage %>" width="50" height="50" alt="Profile Image">
+                        <hr class="divider">
+                    </div>
 
-                            <%= comment.createdBy.fullName %>:
-
-                                <pre><%= comment.content %></pre>
-                        </div>
+                    <!-- Blog Body -->
+                    <div class="blog-body">
+                        <% 
+                            const paragraphs = blog.body ? blog.body.split(/\n\n+/).filter(p => p.trim()) : [];
+                        %>
+                        <% paragraphs.forEach(paragraph => { %>
+                            <p><%= paragraph %></p>
                         <% }) %>
+                    </div>
+
+                    <!-- Author Card -->
+                    <div class="blog-author-card">
+                        <div class="author-info">
+                            <img 
+                                src="<%= blog.createdBy.profileImage || 'https://via.placeholder.com/60' %>"
+                                alt="<%= blog.createdBy.fullName %>"
+                                loading="lazy"
+                            >
+                        </div>
+                        <div>
+                            <h6><%= blog.createdBy.fullName %></h6>
+                            <p style="margin-bottom: 0; color: var(--text-muted); font-size: 0.95rem;">
+                                A passionate writer sharing insights and experiences on Blogify. Join the conversation and discover great stories.
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Sidebar (optional - for future enhancements) -->
+                <div class="col-lg-4 d-none d-lg-block">
+                    <!-- Placeholder for sidebar content -->
+                    <div style="position: sticky; top: 80px;">
+                        <div style="background-color: var(--bg-light); padding: 1.5rem; border-radius: 8px; text-align: center;">
+                            <h6>Share This Post</h6>
+                            <div style="display: flex; gap: 0.5rem; margin-top: 1rem; justify-content: center;">
+                                <a href="#" class="btn btn-sm btn-outline-primary" title="Share on Twitter">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7"></path>
+                                    </svg>
+                                </a>
+                                <a href="#" class="btn btn-sm btn-outline-primary" title="Share on LinkedIn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"></path>
+                                        <circle cx="4" cy="4" r="2"></circle>
+                                    </svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <%- include('./partials/scripts') %>
+    </article>
+
+    <!-- Comments Section -->
+    <section class="section section-light">
+        <div class="container-lg">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="comments-section">
+                        <!-- Comments Header -->
+                        <h2 class="comments-header">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -4px;">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            Discussion (<%= comments.length %>)
+                        </h2>
+
+                        <!-- Add Comment Form -->
+                        <% if (locals.user) { %>
+                            <div class="comment-form">
+                                <h6 style="margin-bottom: 1rem; font-weight: 600;">Share Your Thoughts</h6>
+                                <form action="/blog/comment/<%= blog._id %>" method="POST">
+                                    <div class="mb-3">
+                                        <textarea 
+                                            class="form-control"
+                                            name="content"
+                                            placeholder="What are your thoughts? Join the conversation..."
+                                            rows="4"
+                                            required
+                                            style="resize: vertical;"
+                                        ></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline-block; margin-right: 0.5rem; vertical-align: -2px;">
+                                            <path d="M12 5v14M5 12h14"></path>
+                                        </svg>
+                                        Post Comment
+                                    </button>
+                                </form>
+                            </div>
+                        <% } else { %>
+                            <!-- Sign in prompt for non-logged-in users -->
+                            <div style="background-color: var(--bg-light); padding: 1.5rem; border-radius: 8px; text-align: center; margin-bottom: 2rem;">
+                                <p class="text-muted mb-3">Sign in to join the discussion</p>
+                                <a href="/user/signin" class="btn btn-primary me-2">Sign In</a>
+                                <a href="/user/signup" class="btn btn-outline-primary">Create Account</a>
+                            </div>
+                        <% } %>
+
+                        <!-- Comments List -->
+                        <% if (comments && comments.length > 0) { %>
+                            <div style="margin-top: 2rem;">
+                                <% comments.forEach((comment, index) => { %>
+                                    <div class="comment-card">
+                                        <!-- Comment Avatar -->
+                                        <img 
+                                            src="<%= comment.createdBy.profileImage || 'https://via.placeholder.com/44' %>"
+                                            alt="<%= comment.createdBy.fullName %>"
+                                            class="comment-avatar"
+                                            loading="lazy"
+                                        >
+
+                                        <!-- Comment Content -->
+                                        <div class="comment-content">
+                                            <!-- Author Name -->
+                                            <div class="comment-author">
+                                                <%= comment.createdBy.fullName %>
+                                            </div>
+
+                                            <!-- Comment Text -->
+                                            <p class="comment-text">
+                                                <%= comment.content %>
+                                            </p>
+
+                                            <!-- Comment Time -->
+                                            <div class="comment-time">
+                                                <% 
+                                                    const commentDate = new Date(comment.createdAt);
+                                                    const now = new Date();
+                                                    const diffTime = Math.abs(now - commentDate);
+                                                    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                                                    let timeString;
+                                                    
+                                                    if (diffDays === 0) {
+                                                        const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+                                                        if (diffHours === 0) {
+                                                            const diffMins = Math.floor(diffTime / (1000 * 60));
+                                                            timeString = diffMins + (diffMins === 1 ? ' minute' : ' minutes') + ' ago';
+                                                        } else {
+                                                            timeString = diffHours + (diffHours === 1 ? ' hour' : ' hours') + ' ago';
+                                                        }
+                                                    } else if (diffDays === 1) {
+                                                        timeString = 'Yesterday';
+                                                    } else if (diffDays < 7) {
+                                                        timeString = diffDays + ' days ago';
+                                                    } else {
+                                                        timeString = commentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: commentDate.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+                                                    }
+                                                %>
+                                                <%= timeString %>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <% }) %>
+                            </div>
+                        <% } else { %>
+                            <!-- No comments state -->
+                            <div style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem;">
+                                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                                </svg>
+                                <p>No comments yet. Be the first to share your thoughts!</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('./partials/footer') %>
+    <%- include('./partials/scripts') %>
 </body>
 
 </html>

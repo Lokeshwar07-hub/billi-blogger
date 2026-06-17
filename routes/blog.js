@@ -45,6 +45,9 @@ router.post(
     "/add-new",
     upload.single("coverImage"),
     async (req, res) => {
+
+        console.log(req.file);
+
         const { title, body } = req.body;
 
         const blog = await Blog.create({
