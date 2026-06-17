@@ -1,0 +1,57 @@
+<footer>
+  <div class="container-lg">
+    <div class="row g-4 mb-4">
+      <!-- About Section -->
+      <div class="col-md-3 col-sm-6">
+        <div class="footer-section">
+          <h5>BilliBlogger</h5>
+          <p style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.7); margin-bottom: 1rem;">
+            Share your thoughts, ideas, and expertise with a global community of readers.
+          </p>
+        </div>
+      </div>
+
+      <!-- Product Links -->
+      <div class="col-md-3 col-sm-6">
+        <div class="footer-section">
+          <h5>Product</h5>
+          <a href="/" class="footer-link">Home</a>
+          <a href="/" class="footer-link">Browse Blogs</a>
+          <% if (locals.user) { %>
+            <a href="/blog/add-new" class="footer-link">Write Blog</a>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Resources -->
+      <div class="col-md-3 col-sm-6">
+        <div class="footer-section">
+          <h5>Resources</h5>
+          <a href="#" class="footer-link">Blog Writing Tips</a>
+          <a href="#" class="footer-link">Community Guidelines</a>
+          <a href="#" class="footer-link">FAQ</a>
+        </div>
+      </div>
+
+      <!-- Connect -->
+      <div class="col-md-3 col-sm-6">
+        <div class="footer-section">
+          <h5>Connect</h5>
+          <a href="#" class="footer-link">Twitter</a>
+          <a href="#" class="footer-link">GitHub</a>
+          <a href="#" class="footer-link">LinkedIn</a>
+          <a href="#" class="footer-link">Contact Us</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <p>&copy; <span id="year"></span> BilliBlogger. All rights reserved. | <a href="#" class="footer-link d-inline">Privacy Policy</a> | <a href="#" class="footer-link d-inline">Terms of Service</a></p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</footer>

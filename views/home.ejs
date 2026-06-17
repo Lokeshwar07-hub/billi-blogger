@@ -3,42 +3,121 @@
 
 <head>
     <%- include('./partials/head') %>
-    <title>Home Page</title>
+    <title>BilliBlogger - Discover Stories from Our Community</title>
 </head>
 
 <body>
     <%- include('./partials/nav') %>
 
-    <div class="container mt-3">
-        <div class="row g-3">
-
-            <% blogs.forEach(blog => { %>
-                <div class="col-md-3">
-                    <div class="card h-100">
-
-                        <img
-                            src="<%= blog.coverImageURL %>"
-                            class="card-img-top"
-                            alt="Blog Image"
-                        >
-
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <%= blog.title %>
-                            </h5>
-
-                            <a href="/blog/<%= blog._id %>" class="btn btn-primary">
-                                Read More
-                            </a>
-                        </div>
-
-                    </div>
+    <!-- Hero Section -->
+    <section class="section section-light border-bottom">
+        <div class="container-lg">
+            <div class="row align-items-center">
+                <div class="col-lg-8 mx-auto text-center py-5">
+                    <h1 class="display-5 fw-bold mb-4">Discover Inspiring Stories</h1>
+                    <p class="lead text-muted mb-4">Read thoughtful articles from writers around the world. Share your own voice with our community.</p>
+                    <% if (!locals.user) { %>
+                        <a href="/user/signup" class="btn btn-primary btn-lg me-3">Start Writing</a>
+                    <% } else { %>
+                        <a href="/blog/add-new" class="btn btn-primary btn-lg me-3">Write a Blog</a>
+                    <% } %>
+                    <a href="#blogs" class="btn btn-outline-primary btn-lg">Explore Blogs</a>
                 </div>
-            <% }) %>
-
+            </div>
         </div>
-    </div>
+    </section>
 
+    <!-- Blog Grid Section -->
+    <section class="section" id="blogs">
+        <div class="container-lg">
+            <% if (blogs && blogs.length > 0) { %>
+                <div class="row g-4">
+                    <% blogs.forEach(blog => { %>
+                        <div class="col-lg-4 col-md-6 col-12">
+                            <div class="card h-100 shadow-sm">
+                                <!-- Blog Cover Image -->
+                                <div style="position: relative; overflow: hidden; background-color: #f0f0f0;">
+                                    
+                                    <img 
+                                        src="<%= blog.coverImageURL %>"
+                                        class="card-img-top"
+                                        alt="<%= blog.title %>"
+                                        loading="lazy"
+                                        style="transition: transform 0.3s ease;"
+                                    >
+                                </div>
+
+                                <div class="card-body d-flex flex-column">
+                                    <!-- Blog Title -->
+                                    <h5 class="card-title">
+                                        <%= blog.title %>
+                                    </h5>
+
+                                    <!-- Blog Excerpt (if available, otherwise show first 100 chars of body) -->
+                                    <p class="card-text">
+                                        <% 
+                                            const excerpt = blog.body ? blog.body.substring(0, 100).trim() + '...' : 'No description available';
+                                        %>
+                                        <%= excerpt %>
+                                    </p>
+
+                                    <!-- Author Info & Metadata -->
+                                    <div class="card-meta mt-auto">
+                                        <div class="card-author">
+                                            <img 
+                                                src="<%= blog.createdBy.profileImage || 'https://via.placeholder.com/32' %>"
+                                                alt="<%= blog.createdBy.fullName %>"
+                                                class="author-avatar"
+                                                loading="lazy"
+                                            >
+                                            <div>
+                                                <div style="font-size: 0.85rem; font-weight: 500;">
+                                                    <%= blog.createdBy.fullName %>
+                                                </div>
+                                                <% 
+                                                    const date = new Date(blog.createdAt);
+                                                    const formattedDate = date.toLocaleDateString('en-US', { 
+                                                        year: 'numeric', 
+                                                        month: 'short', 
+                                                        day: 'numeric' 
+                                                    });
+                                                %>
+                                                <div style="font-size: 0.75rem; color: var(--text-muted);">
+                                                    <%= formattedDate %>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Read More Button -->
+                                    <a href="/blog/<%= blog._id %>" class="btn btn-primary btn-sm mt-3 w-100">
+                                        Read More
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                </div>
+            <% } else { %>
+                <!-- Empty State -->
+                <div class="text-center py-5">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5" style="margin-bottom: 1rem;">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                    <h3 class="text-muted">No blogs yet</h3>
+                    <p class="text-muted">Be the first to share your thoughts with our community.</p>
+                    <% if (locals.user) { %>
+                        <a href="/blog/add-new" class="btn btn-primary">Write Your First Blog</a>
+                    <% } else { %>
+                        <a href="/user/signup" class="btn btn-primary">Sign Up to Write</a>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    </section>
+
+    <%- include('./partials/footer') %>
     <%- include('./partials/scripts') %>
 </body>
 
