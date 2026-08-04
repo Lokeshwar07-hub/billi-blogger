@@ -40,10 +40,15 @@ app.use(express.static(path.resolve('./public')));
 // Routes
 app.get('/', async (req, res) => {
     try {
-        const allBlogs = await Blog.find({}).populate("createdBy");
+        const allBlogs = await Blog.find({})
+            .populate("createdBy", "fullName profileImage");
+
+        // Remove blogs whose author no longer exists
+        const validBlogs = allBlogs.filter(blog => blog.createdBy);
+
         res.render("home", {
             user: req.user,
-            blogs: allBlogs,
+            blogs: validBlogs,
         });
     } catch (error) {
         console.error("❌ HOME PAGE ERROR:", error);
