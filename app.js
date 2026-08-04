@@ -17,12 +17,8 @@ const PORT = process.env.PORT || 8000;
 console.log("🔗 Connecting to MongoDB...");
 mongoose.connect(process.env.MONGO_URL)
     .then(() => {
-        console.log("MongoDB Connected");
-
-        mongoose.connection.once("open", () => {
-            console.log("Connected DB:", mongoose.connection.name);
-            console.log("Host:", mongoose.connection.host);
-        });
+        console.log("✅ MongoDB Connected");
+        console.log("Database:", mongoose.connection.db.databaseName);
     })
     .catch(err => console.log(err));
 // View Engine Setup

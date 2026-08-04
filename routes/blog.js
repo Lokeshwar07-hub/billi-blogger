@@ -21,11 +21,12 @@ router.get("/add-new", (req, res) => {
     });
 });
 
+
 // View specific blog
 router.get("/:id", async (req, res) => {
     try {
         console.log(`📖 FETCHING BLOG: ${req.params.id}`);
-        
+
         const blog = await Blog.findById(req.params.id)
             .populate("createdBy");
 
@@ -61,7 +62,7 @@ router.post(
             console.log("\n" + "=".repeat(60));
             console.log("📝 BLOG CREATION ROUTE HANDLER STARTED");
             console.log("=".repeat(60));
-            
+
             // Check authentication
             if (!req.user) {
                 console.log("❌ USER NOT AUTHENTICATED");
@@ -122,12 +123,21 @@ router.post(
             console.error("   Message:", error.message);
             console.error("   Stack:", error.stack);
             console.error("=".repeat(60) + "\n");
-            
+
             return res.status(500).render("addblog", {
                 user: req.user,
                 error: "Error creating blog: " + error.message,
             });
         }
+        const blog = await Blog.create(blogData);
+
+        const totalBlogs = await Blog.countDocuments();
+        console.log("Database:", Blog.db.name);
+        console.log("Total blogs in database:", totalBlogs);
+
+        console.log("✅ BLOG CREATED SUCCESSFULLY");
+        console.log("   Blog ID:", blog._id);
+        console.log("   Cover Image URL in DB:", blog.coverImageURL);
     }
 );
 
@@ -135,7 +145,7 @@ router.post(
 router.post("/comment/:blogId", async (req, res) => {
     try {
         console.log(`💬 ADDING COMMENT TO BLOG: ${req.params.blogId}`);
-        
+
         if (!req.user) {
             return res.redirect("/user/signin");
         }
@@ -156,7 +166,7 @@ router.post("/comment/:blogId", async (req, res) => {
         console.log("✅ COMMENT ADDED TO BLOG");
         console.log("   Comment ID:", comment._id);
         console.log("   Blog ID:", req.params.blogId);
-        
+
         return res.redirect(`/blog/${req.params.blogId}`);
 
     } catch (error) {
