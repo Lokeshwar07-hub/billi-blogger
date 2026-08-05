@@ -31,6 +31,9 @@ app.use(express.urlencoded({ extended: true })); // ← Added extended: true for
 app.use(express.json()); // ← Added for JSON requests
 app.use(cookieParser());
 
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+
 // 2. Authentication middleware
 app.use(checkForAuhtenticationCookie("token"));
 
