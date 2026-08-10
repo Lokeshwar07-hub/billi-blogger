@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <%- include('./partials/head') %>
+        <title>Edit Blog - BilliBlogger</title>
+        <style>
+            .edit-container {
+                max-width: 900px;
+                margin: 2rem auto;
+                padding: 2rem;
+                background: var(--surface-1);
+                border-radius: 12px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .edit-header {
+                margin-bottom: 2rem;
+            }
+
+            .edit-header h1 {
+                font-size: 2rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 0.5rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.5rem;
+            }
+
+            .form-group label {
+                display: block;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin-bottom: 0.5rem;
+                font-size: 0.95rem;
+            }
+
+            .form-group input[type="text"],
+            .form-group input[type="file"],
+            .form-group textarea,
+            .form-group select {
+                width: 100%;
+                padding: 0.75rem;
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                font-family: inherit;
+                font-size: 0.95rem;
+                background-color: var(--surface-2);
+                color: var(--text-primary);
+                transition: border-color 0.2s;
+            }
+
+            .form-group input[type="text"]:focus,
+            .form-group input[type="file"]:focus,
+            .form-group textarea:focus,
+            .form-group select:focus {
+                outline: none;
+                border-color: #007bff;
+                background-color: var(--surface-2);
+            }
+
+            .form-group textarea {
+                resize: vertical;
+                min-height: 300px;
+                font-family: 'Courier New', monospace;
+                line-height: 1.5;
+            }
+
+            .image-preview {
+                margin-top: 1rem;
+                max-width: 300px;
+                border-radius: 6px;
+                overflow: hidden;
+                border: 1px solid var(--border);
+            }
+
+            .image-preview img {
+                width: 100%;
+                height: auto;
+                display: block;
+            }
+
+            .preview-label {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                margin-top: 0.5rem;
+            }
+
+            .button-group {
+                display: flex;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+
+            .btn-update {
+                flex: 1;
+                padding: 0.75rem 2rem;
+                background: #007bff;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
+
+            .btn-update:hover {
+                background: #0056b3;
+            }
+
+            .btn-update:disabled {
+                background: #cccccc;
+                cursor: not-allowed;
+            }
+
+            .btn-cancel {
+                flex: 1;
+                padding: 0.75rem 2rem;
+                background: var(--surface-2);
+                color: var(--text-primary);
+                border: 1px solid var(--border);
+                border-radius: 6px;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.3s;
+            }
+
+            .btn-cancel:hover {
+                background: var(--surface-3);
+            }
+
+            .error-message {
+                background: #f8d7da;
+                color: #721c24;
+                padding: 1rem;
+                border-radius: 6px;
+                margin-bottom: 1.5rem;
+                border-left: 4px solid #dc3545;
+            }
+
+            .success-message {
+                background: #d4edda;
+                color: #155724;
+                padding: 1rem;
+                border-radius: 6px;
+                margin-bottom: 1.5rem;
+                border-left: 4px solid #28a745;
+            }
+
+            .form-hint {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                margin-top: 0.25rem;
+            }
+
+            .loading-spinner {
+                display: none;
+                width: 20px;
+                height: 20px;
+                border: 3px solid rgba(255, 255, 255, 0.3);
+                border-radius: 50%;
+                border-top-color: white;
+                animation: spin 0.8s linear infinite;
+            }
+
+            @keyframes spin {
+                to {
+                    transform: rotate(360deg);
+                }
+            }
+
+            .btn-update.loading {
+                opacity: 0.7;
+                pointer-events: none;
+            }
+
+            .btn-update.loading .loading-spinner {
+                display: inline-block;
+                margin-right: 0.5rem;
+                vertical-align: middle;
+            }
+
+            .tag-input {
+                font-size: 0.9rem;
+            }
+
+            @media (max-width: 768px) {
+                .edit-container {
+                    padding: 1.5rem;
+                    margin: 1rem;
+                }
+
+                .button-group {
+                    flex-direction: column;
+                }
+
+                .edit-header h1 {
+                    font-size: 1.5rem;
+                }
+            }
+        </style>
+</head>
+
+<body>
+    <%- include('./partials/nav') %>
+
+        <div class="edit-container">
+            <div class="edit-header">
+                <h1>✏️ Edit Blog Post</h1>
+                <p style="color: var(--text-secondary); margin: 0;">Update your blog post content and cover image</p>
+            </div>
+
+            <% if (locals.error) { %>
+                <div class="error-message">
+                    <strong>Error:</strong>
+                    <%= error %>
+                </div>
+                <% } %>
+
+                    <form id="editBlogForm" method="POST" action="/blog/<%= blog._id %>?_method=PUT"
+                        enctype="multipart/form-data">
+
+                        <!-- Blog Title -->
+                        <div class="form-group">
+                            <label for="title">Blog Title *</label>
+                            <input type="text" id="title" name="title" value="<%= blog.title %>"
+                                placeholder="Enter your blog title" required>
+                            <div class="form-hint">Give your blog an engaging title (3-150 characters)</div>
+                        </div>
+
+                        <!-- Blog Category -->
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select id="category" name="category">
+                                <option value="Other" <%=blog.category==='Other' ? 'selected' : '' %>>Other</option>
+                                <option value="Technology" <%=blog.category==='Technology' ? 'selected' : '' %>
+                                    >Technology</option>
+                                <option value="Lifestyle" <%=blog.category==='Lifestyle' ? 'selected' : '' %>>Lifestyle
+                                </option>
+                                <option value="Travel" <%=blog.category==='Travel' ? 'selected' : '' %>>Travel</option>
+                                <option value="Food" <%=blog.category==='Food' ? 'selected' : '' %>>Food</option>
+                                <option value="Business" <%=blog.category==='Business' ? 'selected' : '' %>>Business
+                                </option>
+                                <option value="Education" <%=blog.category==='Education' ? 'selected' : '' %>>Education
+                                </option>
+                                <option value="Health" <%=blog.category==='Health' ? 'selected' : '' %>>Health</option>
+                            </select>
+                        </div>
+
+                        <!-- Blog Tags -->
+                        <div class="form-group">
+                            <label for="tags">Tags</label>
+                            <input type="text" id="tags" name="tags" class="tag-input"
+                                value="<%= blog.tags ? blog.tags.join(', ') : '' %>"
+                                placeholder="Enter tags separated by commas (e.g. javascript, web, tutorial)">
+                            <div class="form-hint">Separate multiple tags with commas for better organization</div>
+                        </div>
+
+                        <!-- Cover Image -->
+                        <div class="form-group">
+                            <label for="coverImage">Cover Image</label>
+                            <input type="file" id="coverImage" name="coverImage" accept="image/*"
+                                onchange="previewImage(event)">
+                            <div class="form-hint">Upload a new cover image (optional). Leave empty to keep current
+                                image</div>
+
+                            <!-- Current Image Preview -->
+                            <% if (blog.coverImageURL) { %>
+                                <div style="margin-top: 1rem;">
+                                    <p style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-secondary);">
+                                        Current Cover Image:</p>
+                                    <div class="image-preview">
+                                        <img src="<%= blog.coverImageURL %>" alt="Current cover">
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                    <!-- New Image Preview -->
+                                    <div id="newImagePreview"></div>
+                        </div>
+
+                        <!-- Blog Body -->
+                        <div class="form-group">
+                            <label for="body">Blog Content *</label>
+                            <textarea id="body" name="body" placeholder="Write your blog content here..."
+                                required><%= blog.body %></textarea>
+                            <div class="form-hint">Write engaging content for your readers (minimum 10 characters)</div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="button-group">
+                            <button type="submit" class="btn-update" id="submitBtn">
+                                <span class="loading-spinner"></span>
+                                Update Blog
+                            </button>
+                            <button type="button" class="btn-cancel" onclick="window.history.back()">
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+        </div>
+
+        <%- include('./partials/footer') %>
+            <%- include('./partials/scripts') %>
+
+                <script>
+                    // Image Preview Function
+                    function previewImage(event) {
+                        const file = event.target.files[0];
+                        const previewContainer = document.getElementById('newImagePreview');
+
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                previewContainer.innerHTML = `
+                        <div style="margin-top: 1rem;">
+                            <p style="font-weight: 600; margin-bottom: 0.5rem; color: var(--text-secondary);">New Cover Image Preview:</p>
+                            <div class="image-preview">
+                                <img src="${e.target.result}" alt="New cover preview">
+                            </div>
+                        </div>
+                    `;
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            previewContainer.innerHTML = '';
+                        }
+                    }
+
+                    // Form Submission Handler
+                    document.getElementById('editBlogForm').addEventListener('submit', function (e) {
+                        const submitBtn = document.getElementById('submitBtn');
+                        const title = document.getElementById('title').value.trim();
+                        const body = document.getElementById('body').value.trim();
+
+                        // Validation
+                        if (!title) {
+                            e.preventDefault();
+                            alert('Please enter a title');
+                            return;
+                        }
+
+                        if (!body) {
+                            e.preventDefault();
+                            alert('Please enter blog content');
+                            return;
+                        }
+
+                        if (body.length < 10) {
+                            e.preventDefault();
+                            alert('Blog content must be at least 10 characters');
+                            return;
+                        }
+
+                        // Show loading state
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('loading');
+                        submitBtn.innerHTML = '<span class="loading-spinner"></span>Updating...';
+                    });
+                </script>
+</body>
+
+</html>
