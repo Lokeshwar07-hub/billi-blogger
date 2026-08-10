@@ -21,6 +21,50 @@ router.get("/add-new", (req, res) => {
     });
 });
 
+//to edit blogs
+router.get("/:id/edit", async (req, res) => {
+    try {
+        console.log(`✏️  LOADING EDIT FORM FOR BLOG: ${req.params.id}`);
+
+        // Check authentication
+        if (!req.user) {
+            console.log("❌ USER NOT AUTHENTICATED");
+            return res.redirect("/user/signin");
+        }
+
+        // ✅ IMPORTANT: Must use .populate("createdBy") to get author details
+        const blog = await Blog.findById(req.params.id).populate("createdBy");
+
+        if (!blog) {
+            console.log(`❌ BLOG NOT FOUND: ${req.params.id}`);
+            return res.status(404).send("Blog not found");
+        }
+
+        // ✅ Check if createdBy exists
+        if (!blog.createdBy) {
+            console.log(`❌ BLOG AUTHOR NOT FOUND: ${req.params.id}`);
+            return res.status(404).send("Blog author not found");
+        }
+
+        // ✅ FIXED: Use req.user._id (not req.user.id) and compare with blog.createdBy._id
+        if (blog.createdBy._id.toString() !== req.user._id.toString()) {
+            console.log("❌ UNAUTHORIZED: User is not the blog author");
+            return res.status(403).send("You can only edit your own blogs");
+        }
+
+        console.log(`✅ EDIT FORM LOADED FOR: ${blog.title}`);
+
+        // ✅ FIXED: Render "editblog" (not "editblogs")
+        res.render("editblog", {
+            user: req.user,
+            blog
+        })
+    } catch (error) {
+        console.error("Edit Error:", error);
+        res.status(500).send("Error: " + error.message);
+    }
+});
+
 
 // View specific blog
 router.get("/:id", async (req, res) => {
@@ -52,7 +96,6 @@ router.get("/:id", async (req, res) => {
         return res.status(500).send("Error fetching blog: " + error.message);
     }
 });
-
 
 
 // Create new blog with image upload
@@ -177,26 +220,84 @@ router.post("/comment/:blogId", async (req, res) => {
     }
 });
 
-//Delete Route
-router.delete("/:id", async (req, res) => {
+//EDIT//update blogs
+router.put("/:id", upload("coverImage"), async (req, res) => {
     try {
+        const { title, body, category, tags } = req.body;
+
         const blog = await Blog.findById(req.params.id);
 
-        if(!blog){
-            return res.status(404).json({error:"Blog not found"});
+        if (!blog) {
+            return res.status(404).json({ error: "Blog not found" });
         }
 
-        if(blog.createdBy.toString() != req.user._id.toString()){
-            return res.status(403).json({error:"Unauthorized"});
+        // Authorization check
+        if (blog.createdBy.toString() !== req.user._id.toString()) {
+            return res.status(403).json({
+                error: "Unauthorized - You can only edit your own blogs"
+            });
         }
 
-        await Blog.findByIdAndDelete(req.params.id);
-        res.json({success: true , message: "Blog Deleted Successfully"});
+        //updating fields
+        if (!title || !title.trim()) {
+            return res.status(400).json({ error: "Title is required" });
+        }
+
+        if (!body || !body.trim()) {
+            return res.status(400).json({ error: "Body is required" });
+        }
+
+        blog.title = title.trim();
+        blog.body = body.trim();
+        blog.category = category || "other";
+        blog.tags = tags ? tags.split(',').map(t => t.trim()) : [];
+
+        //image update
+        if (req.file) {
+            console.log("📸 NEW COVER IMAGE PROVIDED");
+            blog.coverImageURL = req.file.path;
+        }
+
+        await blog.save();
+
+        console.log(`Blog ${blog._id} updated successfully`);
+        res.redirect(`/blog/${blog._id}`);
     } catch (error) {
-        res.status(500).json({error: error.message});
+        console.error("Update Error:", error);
+        res.status(500).json({ error: error.message });
     }
 });
 
+
+//Delete Route
+router.delete("/:id", async (req, res) => {
+    try {
+
+        if (!req.user) {
+            console.log("❌ USER NOT AUTHENTICATED");
+            return res.status(401).json({ success: false, message: "Please login to delete" });
+        }
+
+        const blog = await Blog.findById(req.params.id);
+
+        if (!blog) {
+            return res.status(404).json({ error: "Blog not found" });
+        }
+
+        if (blog.createdBy.toString() != req.user._id.toString()) {
+            return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        await Comment.deleteMany({ blogId: req.params.id });
+        console.log("COMMENTS DELETED");
+
+        await Blog.findByIdAndDelete(req.params.id);
+        res.json({ success: true, message: "Blog Deleted Successfully" });
+    } catch (error) {
+        console.error("DELETE ERROR:", error.message);
+        return res.status(500).json({ success: false, message: "Error deleting blog: " + error.message });
+    }
+});
 
 
 module.exports = router;
